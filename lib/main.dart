@@ -1,31 +1,40 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/home_screen.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Supabase (replace with your URL and anon key)
+  await Supabase.initialize(
+    url:
+        'https://bdloilxstqdtaidlrooe.supabase.co', // From Supabase Dashboard > Settings > API
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkbG9pbHhzdHFkdGFpZGxyb29lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMTEyNDksImV4cCI6MjA3NTU4NzI0OX0.8MKZntuc_R5R0B47JQtN-Rtz1-hTCSTf0ekOQMcGxlw', // From Supabase Dashboard > Settings > API
+  );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Flutter App',
+      title: 'Quiz App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HelloWorldPage(),
-    );
-  }
-}
-
-class HelloWorldPage extends StatelessWidget {
-  const HelloWorldPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Hello World App')),
-      body: const Center(
-        child: Text('Hello, World!', style: TextStyle(fontSize: 24)),
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Supabase.instance.client.auth.currentSession != null
+            ? const HomeScreen()
+            : const LoginScreen(),
+        '/signup': (context) => const SignUpScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }
