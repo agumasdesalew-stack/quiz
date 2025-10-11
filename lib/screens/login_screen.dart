@@ -1,4 +1,3 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
@@ -17,18 +16,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     setState(() => _isLoading = true);
-    final user = await _authService.signIn(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-    setState(() => _isLoading = false);
+    try {
+      final user = await _authService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      setState(() => _isLoading = false);
 
-    if (user != null && mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid credentials')));
+      if (user != null && mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid email or password')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        String errorMessage = 'Login failed. Please try again.';
+        if (e.toString().contains('invalid_credentials')) {
+          errorMessage = 'Invalid email or password.';
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
     }
   }
 
@@ -57,11 +69,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 : ElevatedButton(onPressed: _login, child: const Text('Login')),
             TextButton(
               onPressed: () => Navigator.pushNamed(context, '/signup'),
-              child: const Text('Sign Up'),
+              child: const Text('Don\'t have an account? Sign Up'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

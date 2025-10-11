@@ -1,4 +1,3 @@
-// lib/screens/signup_screen.dart
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
@@ -17,23 +16,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
 
   Future<void> _signUp() async {
-    setState(() => _isLoading = true);
-    final user = await _authService.signUp(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      username: _usernameController.text.trim(),
-    );
-    setState(() => _isLoading = false);
+    if (_usernameController.text.trim().isEmpty ||
+        _emailController.text.trim().isEmpty ||
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      return;
+    }
 
-    if (user != null && mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Signed up! Log in now.')));
-    } else if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Sign up failed')));
+    setState(() => _isLoading = true);
+    try {
+      final user = await _authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        username: _usernameController.text.trim(),
+      );
+      setState(() => _isLoading = false);
+
+      if (user != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign-up successful! Please log in.')),
+        );
+        Navigator.pop(context);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign-up failed. Please try again.')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Sign-up error: $e')));
+      }
     }
   }
 
@@ -69,11 +86,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Login'),
+              child: const Text('Already have an account? Login'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
