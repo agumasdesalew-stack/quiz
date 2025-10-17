@@ -91,10 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          'Welcome Back',
-                          style: theme.textTheme.headline6,
-                        ),
+                        Text('Welcome Back', style: theme.textTheme.headlineSmall),
                         const SizedBox(height: 6),
                         Text(
                           'Sign in to continue to Quiz',
