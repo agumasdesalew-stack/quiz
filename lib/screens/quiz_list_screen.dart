@@ -30,14 +30,13 @@ class _QuizListScreenState extends State<QuizListScreen> {
         appBar: AppBar(
           title: Text(
             '${widget.category} Quizzes',
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
-          backgroundColor: const Color(0xFFD1C4E9), // Light purple
-          elevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -68,24 +67,23 @@ class _QuizListScreenState extends State<QuizListScreen> {
                   spacing: 12,
                   runSpacing: 12,
                   children: quizzes.asMap().entries.map((entry) {
-                    final index = entry.key;
                     final quiz = entry.value;
                     return SizedBox(
                       width: (MediaQuery.of(context).size.width - 44) / 2, // Adjust for padding
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF7E57C2),
+                          backgroundColor: Theme.of(context).colorScheme.surface,
+                          foregroundColor: Theme.of(context).colorScheme.primary,
                           padding: const EdgeInsets.symmetric(
                             vertical: 16,
                             horizontal: 12,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Color(0xFFD1C4E9)),
+                            side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
                           ),
-                          elevation: 2,
-                          shadowColor: Colors.black26,
+                          elevation: 1,
+                          shadowColor: Colors.black12,
                         ),
                         onPressed: () {
                           Navigator.push(
@@ -100,10 +98,10 @@ class _QuizListScreenState extends State<QuizListScreen> {
                           children: [
                             Text(
                               quiz.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF7E57C2),
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               textAlign: TextAlign.center,
                               maxLines: 2,

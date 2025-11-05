@@ -49,22 +49,21 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'Quiz App',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
-          backgroundColor: const Color(0xFFD1C4E9), // Light purple
-          elevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: CircleAvatar(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF7E57C2),
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                foregroundColor: Theme.of(context).colorScheme.primary,
                 child: Text(
                   _username != null ? _username![0].toUpperCase() : '',
                   style: const TextStyle(
@@ -75,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
+              icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.onPrimary),
               onPressed: () async {
                 await _authService.signOut();
                 if (mounted) {
@@ -90,8 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFD1C4E9),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,8 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF7E57C2),
+                      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
                       child: Text(
                         _username != null ? _username![0].toUpperCase() : '',
                         style: const TextStyle(
@@ -112,16 +111,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 10),
                     Text(
                       _username ?? 'Guest',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       _authService.currentUser?.email ?? 'No email',
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
                         fontSize: 14,
                       ),
                     ),
@@ -129,15 +128,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.person, color: Color(0xFF7E57C2)),
+                leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
                 title: const Text('Profile'),
                 onTap: () {
-                  // Navigate to profile screen (to be implemented)
                   Navigator.pop(context);
+                  Navigator.pushNamed(context, '/profile');
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.settings, color: Color(0xFF7E57C2)),
+                leading: Icon(Icons.settings, color: Theme.of(context).colorScheme.primary),
                 title: const Text('Settings'),
                 onTap: () {
                   // Navigate to settings screen (to be implemented)
@@ -145,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.logout, color: Color(0xFF7E57C2)),
+                leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.primary),
                 title: const Text('Sign Out'),
                 onTap: () async {
                   await _authService.signOut();

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/quiz_model.dart';
+import '../services/history_service.dart';
 
 class QuizScreen extends StatefulWidget {
   final QuizModel quiz;
@@ -13,6 +15,7 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   int _currentQuestionIndex = 0;
   int _score = 0;
+  bool _attemptSaved = false;
 
   void _answerQuestion(int selectedIndex) {
     if (selectedIndex ==
@@ -32,14 +35,13 @@ class _QuizScreenState extends State<QuizScreen> {
         appBar: AppBar(
           title: Text(
             widget.quiz.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 24,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
-          backgroundColor: const Color(0xFFD1C4E9), // Light purple
-          elevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: _currentQuestionIndex >= widget.quiz.questions.length
             ? _buildResultsScreen(context)
@@ -59,16 +61,16 @@ class _QuizScreenState extends State<QuizScreen> {
           LinearProgressIndicator(
             value: (_currentQuestionIndex + 1) / widget.quiz.questions.length,
             backgroundColor: Colors.grey[300],
-            color: const Color(0xFF7E57C2),
+            color: Theme.of(context).colorScheme.primary,
             minHeight: 8,
           ),
           const SizedBox(height: 16),
           Text(
             'Question ${_currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF7E57C2),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(height: 16),
@@ -90,26 +92,26 @@ class _QuizScreenState extends State<QuizScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF7E57C2),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 20,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: Color(0xFFD1C4E9)),
+                        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
                       ),
-                      elevation: 2,
-                      shadowColor: Colors.black26,
+                      elevation: 1,
+                      shadowColor: Colors.black12,
                     ),
                     onPressed: () => _answerQuestion(index),
                     child: Text(
                       option,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF7E57C2),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -124,6 +126,28 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Widget _buildResultsScreen(BuildContext context) {
     final percentage = (_score / widget.quiz.questions.length * 100).toStringAsFixed(1);
+    if (!_attemptSaved) {
+      // Save attempt after first frame to avoid calling during build repeatedly
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          final auth = Supabase.instance.client.auth.currentUser;
+          if (auth != null) {
+            await HistoryService().saveAttempt(
+              userId: auth.id,
+              quizId: widget.quiz.id,
+              quizTitle: widget.quiz.title,
+              score: _score,
+              total: widget.quiz.questions.length,
+            );
+          }
+        } catch (_) {}
+        if (mounted) {
+          setState(() {
+            _attemptSaved = true;
+          });
+        }
+      });
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Center(
@@ -135,7 +159,7 @@ class _QuizScreenState extends State<QuizScreen> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF7E57C2),
+                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 16),
@@ -159,15 +183,15 @@ class _QuizScreenState extends State<QuizScreen> {
                     value: _score / widget.quiz.questions.length,
                     strokeWidth: 12,
                     backgroundColor: Colors.grey[300],
-                    color: const Color(0xFF7E57C2),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 Text(
                   '$percentage%',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF7E57C2),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ],
@@ -175,8 +199,8 @@ class _QuizScreenState extends State<QuizScreen> {
             const SizedBox(height: 32),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7E57C2),
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -184,7 +208,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 2,
+                elevation: 1,
               ),
               onPressed: () => Navigator.pop(context),
               child: const Text(
